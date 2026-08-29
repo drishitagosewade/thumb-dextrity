@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Thumb Dexterity Assessment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#E8EAE4;
+  --panel:#DEE1D9;
+  --ink:#171C18;
+  --ink-2:#5C635B;
+  --rule:#C2C7BC;
+  --signal:#3A2FE0;
+  --amber:#B8720C;
+  --good:#1E7A55;
+  --bad:#AE3320;
+
+  --sans:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+  --cond:"IBM Plex Sans Condensed","IBM Plex Sans",Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-size:16px;
+  line-height:1.5;
+  overscroll-behavior:none;
+  touch-action:manipulation;
+  -webkit-font-smoothing:antialiased;
+  background-image:
+    linear-gradient(var(--rule) 1px,transparent 1px),
+    linear-gradient(90deg,var(--rule) 1px,transparent 1px);
+  background-size:28px 28px;
+  background-position:-1px -1px;
+}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;
+  background:radial-gradient(120% 80% at 50% 0%,rgba(232,234,228,.35),var(--paper) 72%);
+}
+
+.app{
+  position:relative;
+  max-width:460px;margin:0 auto;
+  min-height:100%;
+  display:flex;flex-direction:column;
+  padding:0 18px calc(24px + env(safe-area-inset-bottom));
+}
+
+/* ---------- status bar ---------- */
+.statusbar{
+  position:sticky;top:0;z-index:20;
+  display:flex;align-items:center;gap:10px;
+  padding:calc(12px + env(safe-area-inset-top)) 0 10px;
+  background:linear-gradient(var(--paper) 72%,rgba(232,234,228,0));
+  font-family:var(--cond);
+  text-transform:uppercase;letter-spacing:.09em;font-size:12px;font-weight:600;
+  color:var(--ink-2);
+}
+.statusbar .dot{width:7px;height:7px;border-radius:50%;background:var(--signal);flex:none;}
+.statusbar .who{margin-left:auto;font-family:var(--mono);letter-spacing:.02em;text-transform:none;}
+
+/* ---------- typography ---------- */
+.eyebrow{
+  font-family:var(--cond);text-transform:uppercase;
+  letter-spacing:.16em;font-size:11px;font-weight:700;color:var(--ink-2);
+}
+h1{
+  font-family:var(--cond);font-weight:700;
+  font-size:clamp(30px,9vw,40px);line-height:1.02;
+  letter-spacing:-.015em;margin:6px 0 10px;
+}
+h2{font-family:var(--cond);font-weight:700;font-size:22px;letter-spacing:-.01em;margin-bottom:4px;}
+.lede{color:var(--ink-2);font-size:15px;max-width:36ch;}
+.mono{font-family:var(--mono);}
+
+/* ---------- screens ---------- */
+.screen{display:none;flex:1;flex-direction:column;padding-bottom:8px;}
+.screen.active{display:flex;animation:fade .28s ease both;}
+@keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+/* ---------- form ---------- */
+.field{margin-bottom:16px;}
+.field label{
+  display:block;font-family:var(--cond);text-transform:uppercase;
+  letter-spacing:.11em;font-size:11px;font-weight:700;color:var(--ink-2);margin-bottom:6px;
+}
+input[type=text],input[type=number],select{
+  width:100%;padding:13px 14px;
+  border:1.5px solid var(--rule);border-radius:2px;
+  background:#F2F4EE;color:var(--ink);
+  font-family:var(--mono);font-size:16px;
+  appearance:none;
+}
+input:focus-visible,select:focus-visible,button:focus-visible{
+  outline:2.5px solid var(--signal);outline-offset:2px;
+}
+.row{display:flex;gap:12px;}
+.row>*{flex:1;}
+
+.segmented{display:flex;gap:0;border:1.5px solid var(--rule);border-radius:2px;overflow:hidden;}
+.segmented button{
+  flex:1;padding:12px 4px;border:0;background:#F2F4EE;color:var(--ink-2);
+  font-family:var(--cond);font-size:13px;font-weight:600;letter-spacing:.04em;
+  text-transform:uppercase;cursor:pointer;border-right:1.5px solid var(--rule);
+}
+.segmented button:last-child{border-right:0;}
+.segmented button[aria-pressed=true]{background:var(--ink);color:var(--paper);}
+
+/* ---------- buttons ---------- */
+.btn{
+  display:flex;align-items:center;gap:12px;width:100%;
+  padding:16px 18px;border:1.5px solid var(--ink);border-radius:2px;
+  background:var(--ink);color:var(--paper);
+  font-family:var(--cond);font-size:16px;font-weight:600;
+  letter-spacing:.04em;text-transform:uppercase;cursor:pointer;
+  transition:transform .1s ease;
+}
+.btn:active{transform:scale(.985);}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--rule);}
+.btn.quiet{background:transparent;color:var(--ink-2);border-color:transparent;padding:12px 0;justify-content:center;}
+.btn .arrow{margin-left:auto;font-family:var(--mono);opacity:.7;}
+.btn .idx{font-family:var(--mono);font-size:12px;opacity:.6;}
+
+.stack{display:flex;flex-direction:column;gap:10px;}
+.spacer{flex:1;min-height:16px;}
+
+/* ---------- test card ---------- */
+.card{
+  border:1.5px solid var(--rule);border-radius:2px;background:#F2F4EE;
+  padding:16px;
+}
+.card + .card{margin-top:10px;}
+.card h3{font-family:var(--cond);font-size:17px;font-weight:700;letter-spacing:-.01em;}
+.card p{font-size:14px;color:var(--ink-2);margin-top:4px;}
+.card .meta{font-family:var(--mono);font-size:11px;color:var(--ink-2);letter-spacing:.02em;margin-top:10px;text-transform:uppercase;}
+
+ol.steps{margin:14px 0 0 0;padding:0;list-style:none;counter-reset:s;}
+ol.steps li{
+  counter-increment:s;position:relative;padding-left:34px;margin-bottom:14px;
+  font-size:15px;color:var(--ink);
+}
+ol.steps li::before{
+  content:counter(s,decimal-leading-zero);
+  position:absolute;left:0;top:1px;
+  font-family:var(--mono);font-size:12px;color:var(--signal);font-weight:600;
+}
+
+/* ---------- readout ---------- */
+.readout{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
+.readout .k{font-family:var(--cond);text-transform:uppercase;letter-spacing:.1em;font-size:11px;font-weight:700;color:var(--ink-2);}
+.readout .v{font-family:var(--mono);font-size:15px;font-weight:500;}
+.hr{height:1px;background:var(--rule);margin:12px 0;}
+
+.bigstat{text-align:center;padding:6px 0;}
+.bigstat .n{font-family:var(--mono);font-size:64px;font-weight:500;line-height:1;letter-spacing:-.04em;}
+.bigstat .u{font-family:var(--cond);text-transform:uppercase;letter-spacing:.14em;font-size:11px;font-weight:700;color:var(--ink-2);margin-top:6px;}
+
+/* ---------- tap pad ---------- */
+.padwrap{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;
+  touch-action:none;
+}
+.timerline{font-family:var(--mono);font-size:15px;letter-spacing:.02em;color:var(--ink-2);}
+.timerline b{color:var(--ink);font-weight:600;}
+
+.pad{
+  position:relative;width:min(70vw,270px);aspect-ratio:1;
+  touch-action:none;user-select:none;-webkit-user-select:none;
+}
+.pad svg{position:absolute;inset:0;width:100%;height:100%;}
+.pad .core{
+  position:absolute;inset:9%;border-radius:50%;
+  background:var(--ink);color:var(--paper);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  transition:transform .05s ease,background .12s ease;
+}
+.pad.hit .core{transform:scale(.955);background:var(--signal);}
+.pad.idle .core{background:var(--panel);color:var(--ink-2);border:1.5px solid var(--rule);}
+.pad .core .count{font-family:var(--mono);font-size:56px;font-weight:500;line-height:1;letter-spacing:-.04em;}
+.pad .core .cap{font-family:var(--cond);text-transform:uppercase;letter-spacing:.16em;font-size:11px;font-weight:700;opacity:.75;}
+
+/* ---------- dial ---------- */
+.dialwrap{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+}
+.dial{
+  width:min(86vw,360px);aspect-ratio:1;
+  touch-action:none;user-select:none;-webkit-user-select:none;position:relative;
+}
+.dial svg{width:100%;height:100%;display:block;}
+.cue{
+  font-family:var(--cond);text-transform:uppercase;letter-spacing:.14em;
+  font-size:12px;font-weight:700;color:var(--ink-2);text-align:center;min-height:18px;
+}
+.cue b{color:var(--signal);}
+.trialbar{display:flex;gap:4px;justify-content:center;}
+.trialbar i{width:20px;height:3px;background:var(--rule);border-radius:2px;display:block;}
+.trialbar i.ok{background:var(--good);}
+.trialbar i.no{background:var(--bad);}
+.trialbar i.now{background:var(--ink);}
+
+/* ---------- table ---------- */
+table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12.5px;}
+th{
+  font-family:var(--cond);text-transform:uppercase;letter-spacing:.1em;font-size:10px;
+  color:var(--ink-2);text-align:right;padding:0 0 7px;font-weight:700;border-bottom:1px solid var(--rule);
+}
+th:first-child{text-align:left;}
+td{padding:7px 0;border-bottom:1px solid var(--rule);text-align:right;}
+td:first-child{text-align:left;}
+tr:last-child td{border-bottom:0;}
+.ok{color:var(--good);}
+.no{color:var(--bad);}
+
+.spark{display:flex;align-items:flex-end;gap:2px;height:44px;margin-top:10px;}
+.spark i{flex:1;background:var(--signal);opacity:.75;border-radius:1px 1px 0 0;min-height:2px;}
+
+.note{font-size:13px;color:var(--ink-2);margin-top:10px;}
+.sessions{margin-top:8px;}
+.sessions .s{
+  display:flex;gap:10px;align-items:baseline;padding:10px 0;border-bottom:1px solid var(--rule);
+  font-family:var(--mono);font-size:12.5px;
+}
+.sessions .s .tag{
+  font-family:var(--cond);text-transform:uppercase;letter-spacing:.08em;font-size:10px;font-weight:700;
+  border:1px solid var(--rule);padding:1px 5px;color:var(--ink-2);
+}
+.sessions .s .r{margin-left:auto;font-weight:500;}
+.empty{padding:26px 0;color:var(--ink-2);font-size:14px;}
+
+.toast{
+  position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);
+  background:var(--ink);color:var(--paper);padding:11px 18px;border-radius:2px;
+  font-family:var(--cond);text-transform:uppercase;letter-spacing:.09em;font-size:12px;font-weight:600;
+  opacity:0;pointer-events:none;transition:.25s ease;z-index:60;
+}
+.toast.show{opacity:1;transform:translate(-50%,0);}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="statusbar">
+    <span class="dot"></span>
+    <span id="sbLabel">Thumb Dexterity Lab</span>
+    <span class="who mono" id="sbWho"></span>
+  </div>
+
+  <!-- ================= SETUP ================= -->
+  <section class="screen active" id="scr-setup">
+    <span class="eyebrow">Session 01 · Participant record</span>
+    <h1>Thumb dexterity assessment</h1>
+    <p class="lede">Two short tests measure how fast and how accurately your thumb moves. Takes about two minutes. Hold the phone in one hand and use that hand's thumb only.</p>
+
+    <div style="height:22px"></div>
+
+    <div class="field">
+      <label for="pid">Participant ID</label>
+      <input type="text" id="pid" placeholder="P001" autocomplete="off" autocapitalize="characters">
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label for="age">Age</label>
+        <input type="number" id="age" placeholder="21" min="1" max="120" inputmode="numeric">
+      </div>
+      <div class="field">
+        <label for="sex">Sex</label>
+        <select id="sex">
+          <option value="">—</option>
+          <option>Female</option>
+          <option>Male</option>
+          <option>Other</option>
+          <option>Prefer not to say</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Hand being tested</label>
+      <div class="segmented" id="segHand">
+        <button type="button" data-v="Left" aria-pressed="false">Left</button>
+        <button type="button" data-v="Right" aria-pressed="true">Right</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Is this your dominant hand?</label>
+      <div class="segmented" id="segDom">
+        <button type="button" data-v="Yes" aria-pressed="true">Yes</button>
+        <button type="button" data-v="No" aria-pressed="false">No</button>
+      </div>
+    </div>
+
+    <div class="spacer"></div>
+    <button class="btn" id="toMenu">Begin session <span class="arrow">→</span></button>
+  </section>
+
+  <!-- ================= MENU ================= -->
+  <section class="screen" id="scr-menu">
+    <span class="eyebrow">Choose a test</span>
+    <h1>Two measures</h1>
+
+    <div style="height:12px"></div>
+
+    <div class="card" id="cardTap" role="button" tabindex="0">
+      <h3>01 — Tapping speed</h3>
+      <p>Tap one spot as fast as you can for ten seconds. Measures repetition rate and rhythm consistency.</p>
+      <div class="meta">10 s · 1 pad · taps/sec</div>
+    </div>
+
+    <div class="card" id="cardDir" role="button" tabindex="0">
+      <h3>02 — Eight-direction reach</h3>
+      <p>Slide your thumb from the centre to whichever target lights up. Measures reaction time, movement time and directional accuracy.</p>
+      <div class="meta">8 trials · 45° spacing · ±22.5° tolerance</div>
+    </div>
+
+    <div class="spacer"></div>
+    <button class="btn ghost" id="toData">Collected data <span class="arrow" id="dataCount">0</span></button>
+    <button class="btn quiet" id="backSetup">Edit participant</button>
+  </section>
+
+  <!-- ================= INSTRUCTIONS ================= -->
+  <section class="screen" id="scr-brief">
+    <span class="eyebrow" id="briefEyebrow">Test 01</span>
+    <h1 id="briefTitle">Tapping speed</h1>
+    <ol class="steps" id="briefSteps"></ol>
+    <div class="spacer"></div>
+    <button class="btn" id="briefGo">I'm ready <span class="arrow">→</span></button>
+    <button class="btn quiet" id="briefBack">Back to tests</button>
+  </section>
+
+  <!-- ================= TAP TEST ================= -->
+  <section class="screen" id="scr-tap">
+    <div class="padwrap">
+      <div class="timerline" id="tapTimer">Tap the pad to start · <b>10.0 s</b></div>
+      <div class="pad idle" id="tapPad">
+        <svg viewBox="0 0 100 100" aria-hidden="true">
+          <circle cx="50" cy="50" r="46" fill="none" stroke="var(--rule)" stroke-width="2.5"/>
+          <circle id="tapRing" cx="50" cy="50" r="46" fill="none" stroke="var(--signal)" stroke-width="2.5"
+                  stroke-linecap="butt" transform="rotate(-90 50 50)"
+                  stroke-dasharray="289.03" stroke-dashoffset="0"/>
+        </svg>
+        <div class="core">
+          <span class="count mono" id="tapCount">0</span>
+          <span class="cap" id="tapCap">Tap to start</span>
+        </div>
+      </div>
+      <div class="timerline" id="tapRate">&nbsp;</div>
+    </div>
+    <button class="btn quiet" id="tapAbort">Cancel test</button>
+  </section>
+
+  <!-- ================= DIRECTION TEST ================= -->
+  <section class="screen" id="scr-dir">
+    <div class="dialwrap">
+      <div class="trialbar" id="dirBar"></div>
+      <div class="dial" id="dial"></div>
+      <div class="cue" id="dirCue">Press and hold the centre</div>
+    </div>
+    <button class="btn quiet" id="dirAbort">Cancel test</button>
+  </section>
+
+  <!-- ================= RESULTS ================= -->
+  <section class="screen" id="scr-result">
+    <span class="eyebrow" id="resEyebrow">Result</span>
+    <h1 id="resTitle">Tapping speed</h1>
+    <div id="resBody"></div>
+    <div class="spacer"></div>
+    <div class="stack">
+      <button class="btn" id="resAgain">Run it again <span class="arrow">↻</span></button>
+      <button class="btn ghost" id="resMenu">Back to tests <span class="arrow">→</span></button>
+    </div>
+  </section>
+
+  <!-- ================= DATA ================= -->
+  <section class="screen" id="scr-data">
+    <span class="eyebrow">Stored on this device</span>
+    <h1>Collected data</h1>
+    <p class="lede">Every completed test is kept here until you clear it. Export writes one CSV row per trial, ready to open in Excel.</p>
+    <div class="sessions" id="sessionList"></div>
+    <div class="spacer"></div>
+    <div class="stack">
+      <button class="btn" id="exportCsv">Download CSV <span class="arrow">↓</span></button>
+      <button class="btn ghost" id="clearData">Clear all records</button>
+      <button class="btn quiet" id="dataBack">Back to tests</button>
+    </div>
+  </section>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   Thumb Dexterity Assessment — MVP
+   Screens · Tapping test · 8-direction reach · CSV export
+   ============================================================ */
+
+const $  = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+
+/* ---------- storage (works inside Claude artifacts, on a web
+     server, and offline; falls back to memory) ---------- */
+const Store = (() => {
+  const KEY = 'tda_records_v1';
+  let mem = null;
+  const hasWin = typeof window.storage !== 'undefined';
+  return {
+    async load() {
+      try {
+        if (hasWin) {
+          const r = await window.storage.get(KEY);
+          return r ? JSON.parse(r.value) : [];
+        }
+        const r = localStorage.getItem(KEY);
+        return r ? JSON.parse(r) : [];
+      } catch (e) { return mem || []; }
+    },
+    async save(v) {
+      mem = v;
+      try {
+        if (hasWin) { await window.storage.set(KEY, JSON.stringify(v)); return; }
+        localStorage.setItem(KEY, JSON.stringify(v));
+      } catch (e) { /* memory only */ }
+    }
+  };
+})();
+
+/* ---------- app state ---------- */
+const state = {
+  participant: { id: '', age: '', sex: '', hand: 'Right', dominant: 'Yes' },
+  records: [],
+  lastTest: null,
+  lastResult: null
+};
+
+/* ---------- screen router ---------- */
+function show(id) {
+  $$('.screen').forEach(s => s.classList.remove('active'));
+  $('#scr-' + id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+function toast(msg) {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), 1900);
+}
+function syncStatus() {
+  const p = state.participant;
+  $('#sbWho').textContent = p.id ? p.id + ' · ' + p.hand.charAt(0) : '';
+}
+
+/* ---------- setup screen ---------- */
+function bindSegment(sel, key) {
+  $$(sel + ' button').forEach(b => {
+    b.addEventListener('click', () => {
+      $$(sel + ' button').forEach(o => o.setAttribute('aria-pressed', 'false'));
+      b.setAttribute('aria-pressed', 'true');
+      state.participant[key] = b.dataset.v;
+    });
+  });
+}
+bindSegment('#segHand', 'hand');
+bindSegment('#segDom', 'dominant');
+
+$('#toMenu').addEventListener('click', () => {
+  const id = $('#pid').value.trim();
+  if (!id) { $('#pid').focus(); toast('Enter a participant ID'); return; }
+  state.participant.id  = id;
+  state.participant.age = $('#age').value.trim();
+  state.participant.sex = $('#sex').value;
+  syncStatus();
+  show('menu');
+});
+$('#backSetup').addEventListener('click', () => show('setup'));
+
+/* ---------- instructions ---------- */
+const BRIEFS = {
+  tap: {
+    eyebrow: 'Test 01',
+    title: 'Tapping speed',
+    steps: [
+      'Hold the phone in your ' + '<span id="__h"></span>' + ' hand. Use only that thumb.',
+      'Tap the dark pad once to start the clock.',
+      'Keep tapping the same spot as fast as you can.',
+      'The pad locks itself after ten seconds. Don\'t stop early.'
+    ]
+  },
+  dir: {
+    eyebrow: 'Test 02',
+    title: 'Eight-direction reach',
+    steps: [
+      'Rest your thumb on the centre circle and hold it there.',
+      'One of the eight targets lights up the moment you touch down.',
+      'Slide straight out to that target, then lift your thumb.',
+      'Return to the centre and hold again for the next trial. Eight trials total.'
+    ]
+  }
+};
+function openBrief(kind) {
+  state.lastTest = kind;
+  const b = BRIEFS[kind];
+  $('#briefEyebrow').textContent = b.eyebrow;
+  $('#briefTitle').textContent   = b.title;
+  $('#briefSteps').innerHTML     = b.steps.map(s => '<li>' + s + '</li>').join('');
+  const h = $('#__h');
+  if (h) h.textContent = state.participant.hand.toLowerCase();
+  show('brief');
+}
+$('#cardTap').addEventListener('click', () => openBrief('tap'));
+$('#cardDir').addEventListener('click', () => openBrief('dir'));
+$$('.card[role=button]').forEach(c => c.addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); c.click(); }
+}));
+$('#briefBack').addEventListener('click', () => show('menu'));
+$('#briefGo').addEventListener('click', () => {
+  if (state.lastTest === 'tap') startTap(); else startDir();
+});
+
+/* ============================================================
+   TEST 01 — TAPPING SPEED
+   ============================================================ */
+const TAP_DURATION = 10000;          // ms
+const RING_LEN = 289.03;             // 2πr for r=46
+
+const tap = { running:false, armed:false, count:0, t0:0, stamps:[], raf:0 };
+
+function startTap() {
+  tap.running = false; tap.armed = true;
+  tap.count = 0; tap.stamps = [];
+  $('#tapCount').textContent = '0';
+  $('#tapCap').textContent = 'Tap to start';
+  $('#tapPad').classList.add('idle');
+  $('#tapTimer').innerHTML = 'Tap the pad to start · <b>10.0 s</b>';
+  $('#tapRate').innerHTML = '&nbsp;';
+  $('#tapRing').setAttribute('stroke-dashoffset', '0');
+  show('tap');
+}
+
+function registerTap(e) {
+  e.preventDefault();
+  if (!tap.armed && !tap.running) return;
+
+  const now = performance.now();
+
+  if (tap.armed) {                       // first touch starts the clock
+    tap.armed = false;
+    tap.running = true;
+    tap.t0 = now;
+    $('#tapPad').classList.remove('idle');
+    $('#tapCap').textContent = 'taps';
+    tickTap();
+  }
+
+  tap.count++;
+  tap.stamps.push(now - tap.t0);
+  $('#tapCount').textContent = tap.count;
+
+  const pad = $('#tapPad');
+  pad.classList.add('hit');
+  clearTimeout(pad._h);
+  pad._h = setTimeout(() => pad.classList.remove('hit'), 60);
+
+  if (navigator.vibrate) navigator.vibrate(8);
+}
+
+function tickTap() {
+  const elapsed = performance.now() - tap.t0;
+  const left = Math.max(0, TAP_DURATION - elapsed);
+  const p = Math.min(1, elapsed / TAP_DURATION);
+
+  $('#tapTimer').innerHTML = 'Time remaining · <b>' + (left / 1000).toFixed(1) + ' s</b>';
+  $('#tapRing').setAttribute('stroke-dashoffset', (RING_LEN * p).toFixed(2));
+  if (elapsed > 400) {
+    $('#tapRate').textContent = (tap.count / (elapsed / 1000)).toFixed(2) + ' taps/sec';
+  }
+
+  if (left <= 0) { finishTap(); return; }
+  tap.raf = requestAnimationFrame(tickTap);
+}
+
+function finishTap() {
+  cancelAnimationFrame(tap.raf);
+  tap.running = false; tap.armed = false;
+  $('#tapPad').classList.add('idle');
+  $('#tapCap').textContent = 'done';
+  if (navigator.vibrate) navigator.vibrate([12, 60, 12]);
+
+  const secs = TAP_DURATION / 1000;
+  const intervals = [];
+  for (let i = 1; i < tap.stamps.length; i++) intervals.push(tap.stamps[i] - tap.stamps[i - 1]);
+  const mean = intervals.length ? intervals.reduce((a, b) => a + b, 0) / intervals.length : 0;
+  const sd = intervals.length > 1
+    ? Math.sqrt(intervals.reduce((a, b) => a + (b - mean) ** 2, 0) / (intervals.length - 1)) : 0;
+  const cv = mean ? (sd / mean) * 100 : 0;
+
+  const result = {
+    test: 'Tapping', duration: secs, taps: tap.count,
+    rate: tap.count / secs, meanInterval: mean, sdInterval: sd, cv, intervals
+  };
+  state.lastResult = result;
+  saveTapRecord(result);
+  setTimeout(() => renderTapResult(result), 350);
+}
+
+$('#tapPad').addEventListener('pointerdown', registerTap);
+$('#tapPad').addEventListener('contextmenu', e => e.preventDefault());
+$('#tapAbort').addEventListener('click', () => {
+  cancelAnimationFrame(tap.raf);
+  tap.running = false; tap.armed = false;
+  show('menu');
+});
+
+function renderTapResult(r) {
+  $('#resEyebrow').textContent = 'Test 01 · Result';
+  $('#resTitle').textContent = 'Tapping speed';
+
+  const max = Math.max(...r.intervals, 1);
+  const bars = r.intervals.slice(0, 60)
+    .map(v => '<i style="height:' + Math.max(4, (v / max) * 100) + '%"></i>').join('');
+
+  $('#resBody').innerHTML =
+    '<div class="card">' +
+      '<div class="bigstat"><div class="n">' + r.rate.toFixed(2) + '</div><div class="u">taps per second</div></div>' +
+      '<div class="hr"></div>' +
+      row('Total taps', r.taps) +
+      row('Test duration', r.duration.toFixed(0) + ' s') +
+      row('Mean gap between taps', r.meanInterval.toFixed(0) + ' ms') +
+      row('Rhythm variability (SD)', r.sdInterval.toFixed(0) + ' ms') +
+      row('Coefficient of variation', r.cv.toFixed(1) + ' %') +
+    '</div>' +
+    '<div class="card"><div class="eyebrow">Tap-by-tap rhythm</div>' +
+      '<div class="spark">' + bars + '</div>' +
+      '<p class="note">Each bar is the gap before that tap. Even bars mean a steady rhythm; spikes are hesitations.</p>' +
+    '</div>';
+  show('result');
+}
+function row(k, v) {
+  return '<div class="readout"><span class="k">' + k + '</span><span class="v">' + v + '</span></div>' +
+         '<div class="hr"></div>';
+}
+
+/* ============================================================
+   TEST 02 — EIGHT-DIRECTION REACH
+   ============================================================ */
+const DIRS = [
+  { name:'Right',      angle:0,   arrow:'→' },
+  { name:'Up-Right',   angle:45,  arrow:'↗' },
+  { name:'Up',         angle:90,  arrow:'↑' },
+  { name:'Up-Left',    angle:135, arrow:'↖' },
+  { name:'Left',       angle:180, arrow:'←' },
+  { name:'Down-Left',  angle:225, arrow:'↙' },
+  { name:'Down',       angle:270, arrow:'↓' },
+  { name:'Down-Right', angle:315, arrow:'↘' }
+];
+const TOLERANCE   = 22.5;   // degrees either side of the target
+const DEADZONE    = 0.10;   // fraction of node radius before movement counts
+const MIN_REACH   = 0.45;   // must travel at least this far to count as a reach
+
+const VB = 400, CX = 200, CY = 200, R_NODE = 148, R_RING = 176;
+
+const dir = { order:[], i:0, trials:[], phase:'idle', target:null,
+              cueT:0, moveT:0, startPt:null, active:false, far:0 };
+
+function buildDial() {
+  const p = [];
+  p.push('<svg viewBox="0 0 ' + VB + ' ' + VB + '" xmlns="http://www.w3.org/2000/svg">');
+
+  // degree ticks — a goniometer edge
+  for (let a = 0; a < 360; a += 7.5) {
+    const major = a % 45 === 0;
+    const r1 = R_RING, r2 = R_RING + (major ? 13 : 6);
+    const rad = a * Math.PI / 180;
+    p.push('<line x1="' + (CX + Math.cos(rad) * r1).toFixed(1) + '" y1="' + (CY - Math.sin(rad) * r1).toFixed(1) +
+           '" x2="' + (CX + Math.cos(rad) * r2).toFixed(1) + '" y2="' + (CY - Math.sin(rad) * r2).toFixed(1) +
+           '" stroke="var(--rule)" stroke-width="' + (major ? 2 : 1) + '"/>');
+  }
+  p.push('<circle cx="' + CX + '" cy="' + CY + '" r="' + R_RING + '" fill="none" stroke="var(--rule)" stroke-width="1"/>');
+
+  // acceptance wedge (drawn behind everything, revealed on cue)
+  p.push('<path id="wedge" fill="var(--signal)" opacity="0" d=""/>');
+
+  // spokes
+  DIRS.forEach((d, i) => {
+    const rad = d.angle * Math.PI / 180;
+    const x = CX + Math.cos(rad) * R_NODE, y = CY - Math.sin(rad) * R_NODE;
+    p.push('<line class="spoke" data-i="' + i + '" x1="' + CX + '" y1="' + CY + '" x2="' + x.toFixed(1) +
+           '" y2="' + y.toFixed(1) + '" stroke="var(--rule)" stroke-width="1" stroke-dasharray="3 5"/>');
+  });
+
+  // traces layer
+  p.push('<g id="traces"></g>');
+
+  // nodes
+  DIRS.forEach((d, i) => {
+    const rad = d.angle * Math.PI / 180;
+    const x = CX + Math.cos(rad) * R_NODE, y = CY - Math.sin(rad) * R_NODE;
+    p.push('<circle class="node" data-i="' + i + '" cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) +
+           '" r="26" fill="#F2F4EE" stroke="var(--rule)" stroke-width="2"/>');
+    p.push('<text class="glyph" data-i="' + i + '" x="' + x.toFixed(1) + '" y="' + (y + 8).toFixed(1) +
+           '" text-anchor="middle" font-size="24" fill="var(--ink-2)" font-family="var(--mono)">' + d.arrow + '</text>');
+  });
+
+  // centre
+  p.push('<circle id="home" cx="' + CX + '" cy="' + CY + '" r="34" fill="#F2F4EE" stroke="var(--ink)" stroke-width="2"/>');
+  p.push('<circle id="homeDot" cx="' + CX + '" cy="' + CY + '" r="7" fill="var(--ink)"/>');
+  p.push('</svg>');
+  $('#dial').innerHTML = p.join('');
+}
+
+function shuffle(a) {
+  const x = a.slice();
+  for (let i = x.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [x[i], x[j]] = [x[j], x[i]];
+  }
+  return x;
+}
+
+function startDir() {
+  buildDial();
+  dir.order = shuffle(DIRS.map((_, i) => i));
+  dir.i = 0; dir.trials = []; dir.phase = 'wait'; dir.active = false;
+  $('#dirBar').innerHTML = DIRS.map(() => '<i></i>').join('');
+  paintBar();
+  setCue('Press and hold the centre');
+  clearHighlights();
+  show('dir');
+}
+function setCue(html) { $('#dirCue').innerHTML = html; }
+function paintBar() {
+  $$('#dirBar i').forEach((el, i) => {
+    el.className = '';
+    if (dir.trials[i]) el.classList.add(dir.trials[i].correct ? 'ok' : 'no');
+    else if (i === dir.i) el.classList.add('now');
+  });
+}
+function clearHighlights() {
+  $$('#dial .node').forEach(n => { n.setAttribute('fill', '#F2F4EE'); n.setAttribute('stroke', 'var(--rule)'); });
+  $$('#dial .glyph').forEach(g => g.setAttribute('fill', 'var(--ink-2)'));
+  $$('#dial .spoke').forEach(s => { s.setAttribute('stroke', 'var(--rule)'); s.setAttribute('stroke-width', '1'); });
+  const w = $('#wedge'); if (w) w.setAttribute('opacity', '0');
+}
+function highlight(i) {
+  clearHighlights();
+  const n = $('#dial .node[data-i="' + i + '"]');
+  const g = $('#dial .glyph[data-i="' + i + '"]');
+  const s = $('#dial .spoke[data-i="' + i + '"]');
+  n.setAttribute('fill', 'var(--signal)'); n.setAttribute('stroke', 'var(--signal)');
+  g.setAttribute('fill', '#F2F4EE');
+  s.setAttribute('stroke', 'var(--signal)'); s.setAttribute('stroke-width', '2');
+
+  // acceptance wedge
+  const a = DIRS[i].angle, r = R_RING;
+  const a1 = (a - TOLERANCE) * Math.PI / 180, a2 = (a + TOLERANCE) * Math.PI / 180;
+  const x1 = CX + Math.cos(a1) * r, y1 = CY - Math.sin(a1) * r;
+  const x2 = CX + Math.cos(a2) * r, y2 = CY - Math.sin(a2) * r;
+  const w = $('#wedge');
+  w.setAttribute('d', 'M ' + CX + ' ' + CY + ' L ' + x1.toFixed(1) + ' ' + y1.toFixed(1) +
+                      ' A ' + r + ' ' + r + ' 0 0 0 ' + x2.toFixed(1) + ' ' + y2.toFixed(1) + ' Z');
+  w.setAttribute('opacity', '0.07');
+}
+
+function dialGeom() {
+  const rect = $('#dial').getBoundingClientRect();
+  return { rect, scale: rect.width / VB };
+}
+function toLocal(e) {
+  const { rect, scale } = dialGeom();
+  return { x: (e.clientX - rect.left) / scale, y: (e.clientY - rect.top) / scale };
+}
+
+$('#dial').addEventListener('pointerdown', e => {
+  if (dir.phase !== 'wait') return;
+  const p = toLocal(e);
+  const d = Math.hypot(p.x - CX, p.y - CY);
+  if (d > 52) { setCue('Start from the <b>centre</b>'); return; }   // must begin at home
+
+  e.preventDefault();
+  $('#dial').setPointerCapture(e.pointerId);
+  dir.active = true;
+  dir.phase = 'moving';
+  dir.startPt = p;
+  dir.far = 0;
+  dir.moveT = 0;
+  dir.target = dir.order[dir.i];
+  dir.cueT = performance.now();
+  highlight(dir.target);
+  setCue('Slide to <b>' + DIRS[dir.target].name.toLowerCase() + '</b>');
+  if (navigator.vibrate) navigator.vibrate(10);
+});
+
+$('#dial').addEventListener('pointermove', e => {
+  if (!dir.active) return;
+  e.preventDefault();
+  const p = toLocal(e);
+  const d = Math.hypot(p.x - dir.startPt.x, p.y - dir.startPt.y);
+  if (d > dir.far) dir.far = d;
+  if (!dir.moveT && d > R_NODE * DEADZONE) dir.moveT = performance.now();
+});
+
+$('#dial').addEventListener('pointerup', endReach);
+$('#dial').addEventListener('pointercancel', endReach);
+
+function endReach(e) {
+  if (!dir.active) return;
+  dir.active = false;
+  const end = performance.now();
+  const p = toLocal(e);
+
+  const dx = p.x - dir.startPt.x;
+  const dy = p.y - dir.startPt.y;
+  const dist = Math.hypot(dx, dy);
+
+  if (dist < R_NODE * MIN_REACH) {          // too short — retry, nothing recorded
+    dir.phase = 'wait';
+    clearHighlights();
+    setCue('Too short — slide further out, then lift');
+    return;
+  }
+
+  let ang = Math.atan2(-dy, dx) * 180 / Math.PI;
+  if (ang < 0) ang += 360;
+
+  const target = DIRS[dir.target];
+  let err = Math.abs(ang - target.angle);
+  if (err > 180) err = 360 - err;
+  const correct = err <= TOLERANCE;
+
+  const reaction = dir.moveT ? dir.moveT - dir.cueT : 0;
+  const movement = dir.moveT ? end - dir.moveT : end - dir.cueT;
+
+  dir.trials[dir.i] = {
+    direction: target.name,
+    targetAngle: target.angle,
+    actualAngle: ang,
+    error: err,
+    correct,
+    reaction,
+    movement,
+    total: end - dir.cueT,
+    distance: dist,
+    vx: dx / dist,
+    vy: dy / dist,
+    reach: Math.min(1, dist / R_NODE)
+  };
+
+  drawTrace(dir.trials[dir.i]);
+  clearHighlights();
+  const n = $('#dial .node[data-i="' + dir.target + '"]');
+  n.setAttribute('stroke', correct ? 'var(--good)' : 'var(--bad)');
+  n.setAttribute('stroke-width', '3');
+
+  setCue(correct
+    ? '<b>' + (end - dir.cueT).toFixed(0) + ' ms</b> · on target'
+    : 'Off by ' + err.toFixed(0) + '°');
+
+  if (navigator.vibrate) navigator.vibrate(correct ? 10 : [8, 40, 8]);
+
+  dir.i++;
+  paintBar();
+
+  if (dir.i >= DIRS.length) {
+    dir.phase = 'done';
+    setTimeout(finishDir, 700);
+  } else {
+    dir.phase = 'wait';
+    setTimeout(() => {
+      if (dir.phase === 'wait') {
+        clearHighlights();
+        setCue('Return to the <b>centre</b> and hold');
+      }
+    }, 700);
+  }
+}
+
+function drawTrace(t) {
+  const g = $('#traces');
+  const len = t.reach * R_NODE;
+  const x = CX + t.vx * len, y = CY + t.vy * len;
+  const ns = 'http://www.w3.org/2000/svg';
+  const line = document.createElementNS(ns, 'line');
+  line.setAttribute('x1', CX); line.setAttribute('y1', CY);
+  line.setAttribute('x2', x.toFixed(1)); line.setAttribute('y2', y.toFixed(1));
+  line.setAttribute('stroke', t.correct ? 'var(--good)' : 'var(--bad)');
+  line.setAttribute('stroke-width', '2.5');
+  line.setAttribute('stroke-linecap', 'round');
+  line.setAttribute('opacity', '0.85');
+  g.appendChild(line);
+  const tip = document.createElementNS(ns, 'circle');
+  tip.setAttribute('cx', x.toFixed(1)); tip.setAttribute('cy', y.toFixed(1));
+  tip.setAttribute('r', '4');
+  tip.setAttribute('fill', t.correct ? 'var(--good)' : 'var(--bad)');
+  g.appendChild(tip);
+}
+
+$('#dirAbort').addEventListener('click', () => { dir.active = false; dir.phase = 'idle'; show('menu'); });
+
+function finishDir() {
+  const t = dir.trials;
+  const times = t.map(x => x.total);
+  const avg = times.reduce((a, b) => a + b, 0) / times.length;
+  const nCorrect = t.filter(x => x.correct).length;
+  const fastest = t.reduce((a, b) => (a.total < b.total ? a : b));
+  const slowest = t.reduce((a, b) => (a.total > b.total ? a : b));
+  const meanErr = t.reduce((a, b) => a + b.error, 0) / t.length;
+  const meanRt  = t.reduce((a, b) => a + b.reaction, 0) / t.length;
+
+  const result = {
+    test: 'Direction', trials: t, avg, accuracy: (nCorrect / t.length) * 100,
+    fastest, slowest, meanErr, meanRt, nCorrect
+  };
+  state.lastResult = result;
+  saveDirRecord(result);
+  renderDirResult(result);
+}
+
+function renderDirResult(r) {
+  $('#resEyebrow').textContent = 'Test 02 · Result';
+  $('#resTitle').textContent = 'Eight-direction reach';
+
+  const rows = r.trials.map(t =>
+    '<tr><td>' + t.direction + '</td><td>' + t.total.toFixed(0) + '</td><td>' + t.error.toFixed(0) + '°</td>' +
+    '<td class="' + (t.correct ? 'ok' : 'no') + '">' + (t.correct ? 'hit' : 'miss') + '</td></tr>'
+  ).join('');
+
+  $('#resBody').innerHTML =
+    '<div class="card">' +
+      '<div class="row" style="gap:18px">' +
+        '<div class="bigstat"><div class="n">' + Math.round(r.avg) + '</div><div class="u">ms average</div></div>' +
+        '<div class="bigstat"><div class="n">' + r.accuracy.toFixed(0) + '</div><div class="u">% on target</div></div>' +
+      '</div>' +
+      '<div class="hr"></div>' +
+      row('Correct directions', r.nCorrect + ' of ' + r.trials.length) +
+      row('Mean reaction time', r.meanRt.toFixed(0) + ' ms') +
+      row('Mean angular error', r.meanErr.toFixed(1) + '°') +
+      row('Fastest direction', r.fastest.direction + ' · ' + r.fastest.total.toFixed(0) + ' ms') +
+      row('Slowest direction', r.slowest.direction + ' · ' + r.slowest.total.toFixed(0) + ' ms') +
+    '</div>' +
+    '<div class="card"><div class="eyebrow">Movement vectors</div>' +
+      '<div id="resDial" style="width:100%;aspect-ratio:1;margin-top:10px"></div>' +
+      '<p class="note">Each line is one reach: its angle is where your thumb actually went, its length is how far you travelled.</p>' +
+    '</div>' +
+    '<div class="card"><div class="eyebrow" style="margin-bottom:10px">Trial detail</div>' +
+      '<table><thead><tr><th>Direction</th><th>ms</th><th>Error</th><th>Result</th></tr></thead>' +
+      '<tbody>' + rows + '</tbody></table></div>';
+
+  $('#resDial').innerHTML = $('#dial').innerHTML;   // reuse the dial with its traces
+  show('result');
+}
+
+/* ---------- results navigation ---------- */
+$('#resAgain').addEventListener('click', () => {
+  if (state.lastTest === 'tap') startTap(); else startDir();
+});
+$('#resMenu').addEventListener('click', () => show('menu'));
+
+/* ============================================================
+   RECORDS + CSV EXPORT
+   ============================================================ */
+function stamp() { return new Date().toISOString(); }
+
+async function pushRecord(rec) {
+  state.records.push(rec);
+  await Store.save(state.records);
+  $('#dataCount').textContent = state.records.length;
+}
+
+function saveTapRecord(r) {
+  const p = state.participant;
+  pushRecord({
+    kind: 'Tapping', timestamp: stamp(), participant: { ...p },
+    summary: r.rate.toFixed(2) + ' taps/s',
+    rows: [{
+      test: 'Thumb Tapping', trial: 1, direction: '',
+      target_angle: '', actual_angle: '', angular_error_deg: '',
+      reaction_ms: '', movement_ms: '', total_ms: '', distance_px: '',
+      correct: '', taps: r.taps, duration_s: r.duration,
+      taps_per_sec: r.rate.toFixed(3),
+      mean_interval_ms: r.meanInterval.toFixed(1),
+      sd_interval_ms: r.sdInterval.toFixed(1),
+      cv_percent: r.cv.toFixed(2)
+    }]
+  });
+}
+
+function saveDirRecord(r) {
+  const p = state.participant;
+  pushRecord({
+    kind: 'Direction', timestamp: stamp(), participant: { ...p },
+    summary: Math.round(r.avg) + ' ms · ' + r.accuracy.toFixed(0) + '%',
+    rows: r.trials.map((t, i) => ({
+      test: 'Direction Test', trial: i + 1, direction: t.direction,
+      target_angle: t.targetAngle, actual_angle: t.actualAngle.toFixed(1),
+      angular_error_deg: t.error.toFixed(1),
+      reaction_ms: t.reaction.toFixed(1), movement_ms: t.movement.toFixed(1),
+      total_ms: t.total.toFixed(1), distance_px: t.distance.toFixed(1),
+      correct: t.correct ? 'Correct' : 'Incorrect',
+      taps: '', duration_s: '', taps_per_sec: '',
+      mean_interval_ms: '', sd_interval_ms: '', cv_percent: ''
+    }))
+  });
+}
+
+const CSV_COLS = [
+  'participant_id','age','sex','hand_tested','dominant_hand','timestamp',
+  'test','trial','direction','target_angle','actual_angle','angular_error_deg',
+  'reaction_ms','movement_ms','total_ms','distance_px','correct',
+  'taps','duration_s','taps_per_sec','mean_interval_ms','sd_interval_ms','cv_percent'
+];
+
+function csvCell(v) {
+  const s = String(v ?? '');
+  return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+}
+
+function buildCsv() {
+  const lines = [CSV_COLS.join(',')];
+  state.records.forEach(rec => {
+    rec.rows.forEach(r => {
+      const p = rec.participant;
+      lines.push([
+        p.id, p.age, p.sex, p.hand, p.dominant, rec.timestamp,
+        r.test, r.trial, r.direction, r.target_angle, r.actual_angle, r.angular_error_deg,
+        r.reaction_ms, r.movement_ms, r.total_ms, r.distance_px, r.correct,
+        r.taps, r.duration_s, r.taps_per_sec, r.mean_interval_ms, r.sd_interval_ms, r.cv_percent
+      ].map(csvCell).join(','));
+    });
+  });
+  return '\uFEFF' + lines.join('\r\n');   // BOM so Excel reads UTF-8
+}
+
+$('#exportCsv').addEventListener('click', () => {
+  if (!state.records.length) { toast('No records yet'); return; }
+  const blob = new Blob([buildCsv()], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'thumb_dexterity_' + new Date().toISOString().slice(0, 10) + '.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  toast('CSV downloaded');
+});
+
+$('#clearData').addEventListener('click', async () => {
+  if (!state.records.length) { toast('Nothing to clear'); return; }
+  if (!confirm('Delete all ' + state.records.length + ' stored records? Export first if you need them.')) return;
+  state.records = [];
+  await Store.save([]);
+  renderSessions();
+  $('#dataCount').textContent = '0';
+  toast('Records cleared');
+});
+
+function renderSessions() {
+  const el = $('#sessionList');
+  if (!state.records.length) {
+    el.innerHTML = '<div class="empty">No records yet. Finish a test and it will appear here.</div>';
+    return;
+  }
+  el.innerHTML = state.records.slice().reverse().map(r => {
+    const d = new Date(r.timestamp);
+    const t = d.toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    return '<div class="s"><span class="tag">' + (r.kind === 'Tapping' ? 'Tap' : 'Dir') + '</span>' +
+           '<span>' + r.participant.id + '</span>' +
+           '<span style="color:var(--ink-2)">' + t + '</span>' +
+           '<span class="r">' + r.summary + '</span></div>';
+  }).join('');
+}
+
+$('#toData').addEventListener('click', () => { renderSessions(); show('data'); });
+$('#dataBack').addEventListener('click', () => show('menu'));
+
+/* ---------- boot ---------- */
+(async function init() {
+  state.records = await Store.load();
+  $('#dataCount').textContent = state.records.length;
+  document.addEventListener('gesturestart', e => e.preventDefault());
+  document.addEventListener('dblclick', e => e.preventDefault());
+})();
+</script>
+</body>
+</html>
